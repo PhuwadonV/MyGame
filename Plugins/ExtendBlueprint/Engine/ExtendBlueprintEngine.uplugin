@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"Category": "Extend Blueprint",
+	"FriendlyName": "Extend Blueprint - Engine",
+	"Version": 1,
+	"VersionName": "1.0",
+	"Description": "Extend Engine functionality to Blueprint",
+	"CreatedBy": "Phuwadon Verasertniyom",
+	"Modules": [
+		{
+			"Name": "ExtendBlueprintEngine",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

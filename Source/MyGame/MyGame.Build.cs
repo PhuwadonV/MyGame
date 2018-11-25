@@ -5,5 +5,6 @@ public class MyGame : ModuleRules {
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core" });
-	}
+        DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
+    }
 }
