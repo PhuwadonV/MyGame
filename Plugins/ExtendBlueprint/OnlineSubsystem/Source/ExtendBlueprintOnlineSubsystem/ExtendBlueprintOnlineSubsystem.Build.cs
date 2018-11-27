@@ -6,6 +6,11 @@ public class ExtendBlueprintOnlineSubsystem : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;		
 		
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "OnlineSubsystem", "OnlineSubsystemUtils" } );
+		PublicDependencyModuleNames.AddRange(new string[] {
+            "Core",
+            "CoreUObject",
+            "Engine",
+            "OnlineSubsystem",
+            "OnlineSubsystemUtils" } );
 	}
 }

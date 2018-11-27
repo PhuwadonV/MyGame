@@ -1,0 +1,6 @@
+del .\MyGame\Binaries\Win64\*.pdb
+del Manifest_DebugFiles_Win64.txt
+del Manifest_NonUFSFiles_Win64.txt
+del .\Engine\Binaries\ThirdParty\PhysX3\Win64\VS2015\*.pdb
+@echo 480 >> .\MyGame\Binaries\Win64\steam_appid.txt
+del Cleaner.bat

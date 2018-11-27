@@ -12,14 +12,14 @@ private:
 	bool bIsFailed;
 	IOnlineSession *OnlineSession;
 	TSharedPtr<const FUniqueNetId> PlayerId;
-	ESessionType SessionType;
-	FDelegateHandle DelegateHandle;
+	EOnlineSessionType SessionType;
+	FDelegateHandle OnCompleteDelegateHandle;
 	
 	UPROPERTY()
 	const UOnlineSessionSettingsWrapper *OnlineSessionSettingsWrapper;
 public:
 	UFUNCTION(BlueprintCallable, Category = "Online|Session", Meta = (BlueprintInternalUseOnly = "true"))
-	static UAsyncCreateOnlineRoom* CreateOnlineRoom(UPARAM() APlayerController *PlayerController, FName OnlineSubsystem, const UOnlineSessionSettingsWrapper *Setting, ESessionType SessionType);
+	static UAsyncCreateOnlineRoom* CreateOnlineRoom(UPARAM() APlayerController *PlayerController, FName OnlineSubsystem, const UOnlineSessionSettingsWrapper *Setting, EOnlineSessionType SessionType);
 
 	UPROPERTY(BlueprintAssignable)
 	FEmptyOnlineDelegate OnSuccess;

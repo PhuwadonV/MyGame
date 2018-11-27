@@ -9,11 +9,11 @@ class UAsyncDestroyOnlineRoom : public UOnlineBlueprintCallProxyBase {
 private:
 	bool bIsFailed;
 	IOnlineSession *OnlineSession;
-	ESessionType SessionType;
-	FDelegateHandle DelegateHandle;
+	EOnlineSessionType SessionType;
+	FDelegateHandle OnCompleteDelegateHandle;
 public:
 	UFUNCTION(BlueprintCallable, Category = "Online|Session", Meta = (BlueprintInternalUseOnly = "true"))
-	static UAsyncDestroyOnlineRoom* DestroyOnlineRoom(FName OnlineSubsystem, ESessionType SessionType);
+	static UAsyncDestroyOnlineRoom* DestroyOnlineRoom(FName OnlineSubsystem, EOnlineSessionType SessionType);
 
 	UPROPERTY(BlueprintAssignable)
 	FEmptyOnlineDelegate OnSuccess;

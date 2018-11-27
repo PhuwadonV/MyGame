@@ -3,6 +3,14 @@
 	"EngineAssociation": "4.21",
 	"Category": "",
 	"Description": "",
+	"PostBuildSteps": {
+		"Win64":[
+			"if \"$(TargetConfiguration)\" == \"Shipping\" (",
+			"if not exist \"%HOMEDRIVE%%HOMEPATH%\\Desktop\\WindowsNoEditor\" mkdir \"%HOMEDRIVE%%HOMEPATH%\\Desktop\\WindowsNoEditor\"",
+			"copy $(ProjectDir)\\Cleaner_bat %HOMEDRIVE%%HOMEPATH%\\Desktop\\WindowsNoEditor\\Cleaner.bat",
+			")"
+		]
+	},
 	"Modules": [
 		{
 			"Name": "MyGame",
@@ -14,6 +22,14 @@
 		{
 			"Name": "OnlineSubsystemSteam",
 			"Enabled": true
+		},
+		{
+			"Name": "OculusVR",
+			"Enabled": false
+		},
+		{
+			"Name": "SteamVR",
+			"Enabled": false
 		}
 	]
 }

@@ -7,80 +7,77 @@
 #endif
 
 UAsyncFindOnlineRooms* UAsyncFindOnlineRooms::FindOnlineRooms(APlayerController *PlayerController, FName OnlineSubsystem, UOnlineSessionSearchWrapper *SessionSearch) {
-	UAsyncFindOnlineRooms *asyncFindOnlineRooms = NewObject<UAsyncFindOnlineRooms>();
+	UAsyncFindOnlineRooms *AsyncFindOnlineRooms = NewObject<UAsyncFindOnlineRooms>();
 
-	IOnlineSubsystem *onlineSubsystem;
+	IOnlineSubsystem *OnlineSubsystemInterface;
 	if (OnlineSubsystem == NAME_None) {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get();
 	}
 	else {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get(OnlineSubsystem);
 	}
 
-	if (onlineSubsystem != nullptr) {
-		IOnlineSessionPtr onlineSessionPtr = onlineSubsystem->GetSessionInterface();
-		if (onlineSessionPtr.IsValid()) {
-			asyncFindOnlineRooms->OnlineSession = onlineSessionPtr.Get();
+	if (OnlineSubsystemInterface != nullptr) {
+		IOnlineSessionPtr OnlineSessionPtr = OnlineSubsystemInterface->GetSessionInterface();
+		if (OnlineSessionPtr.IsValid()) {
+			AsyncFindOnlineRooms->OnlineSession = OnlineSessionPtr.Get();
 		}
 		else {
-			asyncFindOnlineRooms->bIsFailed = true;
-			return asyncFindOnlineRooms;
+			AsyncFindOnlineRooms->bIsFailed = true;
+			return AsyncFindOnlineRooms;
 		}
 	}
 	else {
-		asyncFindOnlineRooms->bIsFailed = true;
-		return asyncFindOnlineRooms;
+		AsyncFindOnlineRooms->bIsFailed = true;
+		return AsyncFindOnlineRooms;
 	}
 
-	asyncFindOnlineRooms->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
+	AsyncFindOnlineRooms->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
 
-	if (!asyncFindOnlineRooms->PlayerId.IsValid()) {
+	if (!AsyncFindOnlineRooms->PlayerId.IsValid()) {
 #if WITH_EDITOR
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Invalid Player ID"));
 #endif
-		asyncFindOnlineRooms->bIsFailed = true;
-		return asyncFindOnlineRooms;
+		AsyncFindOnlineRooms->bIsFailed = true;
+		return AsyncFindOnlineRooms;
 	}
 
 	if (SessionSearch != nullptr) {
-		asyncFindOnlineRooms->SessionSearch = MakeShareable(new FOnlineSessionSearch{ SessionSearch->data });
+		AsyncFindOnlineRooms->SessionSearch = MakeShareable(new FOnlineSessionSearch{ SessionSearch->Data });
 	}
 	else {
-		asyncFindOnlineRooms->SessionSearch = MakeShareable(new FOnlineSessionSearch{});
-		auto& sessionSearch = asyncFindOnlineRooms->SessionSearch;
-		sessionSearch->bIsLanQuery = false;
-		sessionSearch->PingBucketSize = 50;
-		sessionSearch->MaxSearchResults = 100;
+		AsyncFindOnlineRooms->SessionSearch = MakeShareable(new FOnlineSessionSearch{});
+		auto& Search = AsyncFindOnlineRooms->SessionSearch;
+		Search->bIsLanQuery = false;
+		Search->PingBucketSize = 50;
+		Search->MaxSearchResults = 100;
 	}
 
-	return asyncFindOnlineRooms;
+	return AsyncFindOnlineRooms;
 }
 
 void UAsyncFindOnlineRooms::Activate() {
 	if (bIsFailed) return;
-	TArray<UOnlineSessionSearchResultWrapper*> results;
 
 	FOnFindSessionsCompleteDelegate onFindSessionsComplete = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UAsyncFindOnlineRooms::OnComplete);
 
-	DelegateHandle = OnlineSession->AddOnFindSessionsCompleteDelegate_Handle(onFindSessionsComplete);
+	OnCompleteDelegateHandle = OnlineSession->AddOnFindSessionsCompleteDelegate_Handle(onFindSessionsComplete);
 
 	OnlineSession->FindSessions(*PlayerId, SessionSearch.ToSharedRef());
 }
 
 void UAsyncFindOnlineRooms::OnComplete(bool bWasSuccessful) {
-	TArray<UOnlineSessionSearchResultWrapper*> results;
-	
 	if (bWasSuccessful) {
 		for (int32 i = 0; i < SessionSearch->SearchResults.Num(); i++)
 		{
-			UOnlineSessionSearchResultWrapper *result = NewObject<UOnlineSessionSearchResultWrapper>();
-			result->data = SessionSearch->SearchResults[i];
-			results.Add(result);
+			FBlueprintSessionResult BlueprintSessionResult;
+			BlueprintSessionResult.OnlineResult = SessionSearch->SearchResults[i];
+			BlueprintSessionResults.Add(BlueprintSessionResult);
 		}
 
-		OnSuccess.Broadcast(results);
+		OnSuccess.Broadcast(BlueprintSessionResults);
 	}
 	else {
-		OnFailure.Broadcast(results);
+		OnFailure.Broadcast(BlueprintSessionResults);
 	}
 }

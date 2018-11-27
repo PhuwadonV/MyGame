@@ -6,67 +6,65 @@
 #include "Engine.h"
 #endif
 
-UAsyncJoinOnlineRoom* UAsyncJoinOnlineRoom::JoinOnlineRoom(APlayerController *PlayerController, FName OnlineSubsystem, const UOnlineSessionSearchResultWrapper *Session, ESessionType SessionType) {
-	UAsyncJoinOnlineRoom *asyncJoinOnlineRoom = NewObject<UAsyncJoinOnlineRoom>();
+UAsyncJoinOnlineRoom* UAsyncJoinOnlineRoom::JoinOnlineRoom(APlayerController *PlayerController, FName OnlineSubsystem, const FBlueprintSessionResult &Session, EOnlineSessionType SessionType) {
+	UAsyncJoinOnlineRoom *AsyncJoinOnlineRoom = NewObject<UAsyncJoinOnlineRoom>();
 
-	IOnlineSubsystem *onlineSubsystem;
+	IOnlineSubsystem *OnlineSubsystemInterface;
 	if (OnlineSubsystem == NAME_None) {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get();
 	}
 	else {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get(OnlineSubsystem);
 	}
 
-	if (onlineSubsystem != nullptr) {
-		IOnlineSessionPtr onlineSessionPtr = onlineSubsystem->GetSessionInterface();
-		if (onlineSessionPtr.IsValid()) {
-			asyncJoinOnlineRoom->OnlineSession = onlineSessionPtr.Get();
+	if (OnlineSubsystemInterface != nullptr) {
+		IOnlineSessionPtr OnlineSessionPtr = OnlineSubsystemInterface->GetSessionInterface();
+		if (OnlineSessionPtr.IsValid()) {
+			AsyncJoinOnlineRoom->OnlineSession = OnlineSessionPtr.Get();
 		}
 		else {
-			asyncJoinOnlineRoom->bIsFailed = true;
-			return asyncJoinOnlineRoom;
+			AsyncJoinOnlineRoom->bIsFailed = true;
+			return AsyncJoinOnlineRoom;
 		}
 	}
 	else {
-		asyncJoinOnlineRoom->bIsFailed = true;
-		return asyncJoinOnlineRoom;
+		AsyncJoinOnlineRoom->bIsFailed = true;
+		return AsyncJoinOnlineRoom;
 	}
 
-	asyncJoinOnlineRoom->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
+	AsyncJoinOnlineRoom->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
 
-	if (!asyncJoinOnlineRoom->PlayerId.IsValid()) {
+	if (!AsyncJoinOnlineRoom->PlayerId.IsValid()) {
 #if WITH_EDITOR
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Invalid Player ID"));
 #endif
-		asyncJoinOnlineRoom->bIsFailed = true;
-		return asyncJoinOnlineRoom;
+		AsyncJoinOnlineRoom->bIsFailed = true;
+		return AsyncJoinOnlineRoom;
 	}
 
-	asyncJoinOnlineRoom->SessionType = SessionType;
-	asyncJoinOnlineRoom->OnlineSessionSearchResultWrapper = Session;
+	AsyncJoinOnlineRoom->SessionType = SessionType;
+	AsyncJoinOnlineRoom->OnlineSessionSearchResult = Session.OnlineResult;
 
-	return asyncJoinOnlineRoom;
+	return AsyncJoinOnlineRoom;
 }
 
 void UAsyncJoinOnlineRoom::Activate() {
 	if (bIsFailed) return;
 
 	FOnJoinSessionCompleteDelegate onJoinSessionComplete = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UAsyncJoinOnlineRoom::OnComplete);
-	DelegateHandle = OnlineSession->AddOnJoinSessionCompleteDelegate_Handle(onJoinSessionComplete);
+	OnCompleteDelegateHandle = OnlineSession->AddOnJoinSessionCompleteDelegate_Handle(onJoinSessionComplete);
 
 	switch (SessionType) {
-	case ESessionType::Game:
-		OnlineSession->JoinSession(*PlayerId, GameSessionName, OnlineSessionSearchResultWrapper->data);
+	case EOnlineSessionType::Game:
+		OnlineSession->JoinSession(*PlayerId, GameSessionName, OnlineSessionSearchResult);
 		break;
-	case ESessionType::Party:
-		OnlineSession->JoinSession(*PlayerId, PartySessionName, OnlineSessionSearchResultWrapper->data);
+	case EOnlineSessionType::Party:
+		OnlineSession->JoinSession(*PlayerId, PartySessionName, OnlineSessionSearchResult);
 		break;
 	}
 }
 
 void UAsyncJoinOnlineRoom::OnComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result) {
-	TArray<UOnlineSessionSearchResultWrapper*> results;
-
 	if (Result == EOnJoinSessionCompleteResult::Success) {
 		FString ServerUrl;
 		OnlineSession->GetResolvedConnectString(SessionName, ServerUrl);

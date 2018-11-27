@@ -3,14 +3,14 @@
 #include "ExtendBlueprintOnlineSubsystemBase.h"
 #include "OnlineSessionSettingsWrapper.generated.h"
 
-UCLASS(Blueprintable, BlueprintType)
+UCLASS(BlueprintType)
 class UOnlineSessionSettingsWrapper : public UObject {
 	GENERATED_UCLASS_BODY()
 public:
 	UFUNCTION(BlueprintCallable, Category = "Online|Session")
 	static UOnlineSessionSettingsWrapper* CreateOnlineSessionSettingsWrapper();
 
-	FOnlineSessionSettings data;
+	FOnlineSessionSettings Data;
 
 	UFUNCTION(BlueprintCallable)
 	UOnlineSessionSettingsWrapper* SetAllowInvites(bool bAllowInvites);
@@ -53,10 +53,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UOnlineSessionSettingsWrapper* SetAsString(FName Key, FString Value, EOnlineDataAdvertisementTypeWrapper AdvertisementType);
-
-	UFUNCTION(BlueprintPure)
-	void GetAsString(FName Key, bool &IsSuccess, FString &Value) const;
-
-	UFUNCTION(BlueprintPure)
-	void GetAsInteger(FName Key, bool &IsSuccess, int32 &Value) const;
+	
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "OnlineSessionCustomSettingStatus"))
+	void GetAsString(FName Key, FString &Value, EOnlineSessionCustomSettingStatus &OnlineSessionCustomSettingStatus);
 };

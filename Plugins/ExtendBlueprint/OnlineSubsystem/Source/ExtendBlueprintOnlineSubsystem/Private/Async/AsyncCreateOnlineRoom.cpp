@@ -8,75 +8,75 @@
 #include "Engine.h"
 #endif
 
-UAsyncCreateOnlineRoom* UAsyncCreateOnlineRoom::CreateOnlineRoom(APlayerController *PlayerController, FName OnlineSubsystem, const UOnlineSessionSettingsWrapper *Setting, ESessionType SessionType) {
-	UAsyncCreateOnlineRoom *asyncCreateOnlineRoom = NewObject<UAsyncCreateOnlineRoom>();
+UAsyncCreateOnlineRoom* UAsyncCreateOnlineRoom::CreateOnlineRoom(APlayerController *PlayerController, FName OnlineSubsystem, const UOnlineSessionSettingsWrapper *Setting, EOnlineSessionType SessionType) {
+	UAsyncCreateOnlineRoom *AsyncCreateOnlineRoom = NewObject<UAsyncCreateOnlineRoom>();
 
-	IOnlineSubsystem *onlineSubsystem;
+	IOnlineSubsystem *OnlineSubsystemInterface;
 	if (OnlineSubsystem == NAME_None) {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get();
 	}
 	else {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get(OnlineSubsystem);
 	}
 
-	if (onlineSubsystem != nullptr) {
-		IOnlineSessionPtr onlineSessionPtr = onlineSubsystem->GetSessionInterface();
-		if (onlineSessionPtr.IsValid()) {
-			asyncCreateOnlineRoom->OnlineSession = onlineSessionPtr.Get();
+	if (OnlineSubsystemInterface != nullptr) {
+		IOnlineSessionPtr OnlineSessionPtr = OnlineSubsystemInterface->GetSessionInterface();
+		if (OnlineSessionPtr.IsValid()) {
+			AsyncCreateOnlineRoom->OnlineSession = OnlineSessionPtr.Get();
 		}
 		else {
-			asyncCreateOnlineRoom->bIsFailed = true;
-			return asyncCreateOnlineRoom;
+			AsyncCreateOnlineRoom->bIsFailed = true;
+			return AsyncCreateOnlineRoom;
 		}
 	}
 	else {
-		asyncCreateOnlineRoom->bIsFailed = true;
-		return asyncCreateOnlineRoom;
+		AsyncCreateOnlineRoom->bIsFailed = true;
+		return AsyncCreateOnlineRoom;
 	}
 
-	asyncCreateOnlineRoom->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
+	AsyncCreateOnlineRoom->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
 
-	if (!asyncCreateOnlineRoom->PlayerId.IsValid()) {
+	if (!AsyncCreateOnlineRoom->PlayerId.IsValid()) {
 #if WITH_EDITOR
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Invalid Player ID"));
 #endif
-		asyncCreateOnlineRoom->bIsFailed = true;
-		return asyncCreateOnlineRoom;
+		AsyncCreateOnlineRoom->bIsFailed = true;
+		return AsyncCreateOnlineRoom;
 	}
 
 	if (Setting != nullptr) {
-		asyncCreateOnlineRoom->OnlineSessionSettingsWrapper = Setting;
+		AsyncCreateOnlineRoom->OnlineSessionSettingsWrapper = Setting;
 	}
 	else {
-		asyncCreateOnlineRoom->OnlineSessionSettingsWrapper = UOnlineSessionSettingsWrapper::CreateOnlineSessionSettingsWrapper();
+		AsyncCreateOnlineRoom->OnlineSessionSettingsWrapper = UOnlineSessionSettingsWrapper::CreateOnlineSessionSettingsWrapper();
 	}
 
-	asyncCreateOnlineRoom->SessionType = SessionType;
+	AsyncCreateOnlineRoom->SessionType = SessionType;
 
-	return asyncCreateOnlineRoom;
+	return AsyncCreateOnlineRoom;
 }
 
 void UAsyncCreateOnlineRoom::Activate() {
 	if (bIsFailed) return;
 
-	DelegateHandle = OnlineSession->AddOnCreateSessionCompleteDelegate_Handle(
+	OnCompleteDelegateHandle = OnlineSession->AddOnCreateSessionCompleteDelegate_Handle(
 		FOnCreateSessionCompleteDelegate::CreateUObject(this, &UAsyncCreateOnlineRoom::OnCreateSessionComplete));
 
 	switch (SessionType) {
-	case ESessionType::Game:
-		OnlineSession->CreateSession(*PlayerId, GameSessionName, OnlineSessionSettingsWrapper->data);
+	case EOnlineSessionType::Game:
+		OnlineSession->CreateSession(*PlayerId, GameSessionName, OnlineSessionSettingsWrapper->Data);
 		break;
-	case ESessionType::Party:
-		OnlineSession->CreateSession(*PlayerId, PartySessionName, OnlineSessionSettingsWrapper->data);
+	case EOnlineSessionType::Party:
+		OnlineSession->CreateSession(*PlayerId, PartySessionName, OnlineSessionSettingsWrapper->Data);
 		break;
 	}
 }
 
 void UAsyncCreateOnlineRoom::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful) {
-	OnlineSession->ClearOnCreateSessionCompleteDelegate_Handle(DelegateHandle);
+	OnlineSession->ClearOnCreateSessionCompleteDelegate_Handle(OnCompleteDelegateHandle);
 
 	if (bWasSuccessful) {
-		DelegateHandle = OnlineSession->AddOnStartSessionCompleteDelegate_Handle(
+		OnCompleteDelegateHandle = OnlineSession->AddOnStartSessionCompleteDelegate_Handle(
 			FOnCreateSessionCompleteDelegate::CreateUObject(this, &UAsyncCreateOnlineRoom::OnStartSessionComplete));
 
 		OnlineSession->StartSession(SessionName);
@@ -87,7 +87,7 @@ void UAsyncCreateOnlineRoom::OnCreateSessionComplete(FName SessionName, bool bWa
 }
 
 void UAsyncCreateOnlineRoom::OnStartSessionComplete(FName SessionName, bool bWasSuccessful) {
-	OnlineSession->ClearOnStartSessionCompleteDelegate_Handle(DelegateHandle);
+	OnlineSession->ClearOnStartSessionCompleteDelegate_Handle(OnCompleteDelegateHandle);
 
 	if (bWasSuccessful) {
 		OnSuccess.Broadcast();

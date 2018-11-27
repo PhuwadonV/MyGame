@@ -1,10 +1,10 @@
 #include "AsyncExecAfterOneFrame.h"
-#include "Engine/World.h"
+#include "UObject/Object.h"
 
 UAsyncExecAfterOneFrame* UAsyncExecAfterOneFrame::ExecAfterOneFrame(const UObject* WorldContextObject) {
-	UAsyncExecAfterOneFrame *asyncWaitForOneFrame = NewObject<UAsyncExecAfterOneFrame>();
-	asyncWaitForOneFrame->WorldContextObject = WorldContextObject;
-	return asyncWaitForOneFrame;
+	UAsyncExecAfterOneFrame *AsyncWaitForOneFrame = NewObject<UAsyncExecAfterOneFrame>();
+	AsyncWaitForOneFrame->WorldContextObject = WorldContextObject;
+	return AsyncWaitForOneFrame;
 }
 
 void UAsyncExecAfterOneFrame::Activate() {

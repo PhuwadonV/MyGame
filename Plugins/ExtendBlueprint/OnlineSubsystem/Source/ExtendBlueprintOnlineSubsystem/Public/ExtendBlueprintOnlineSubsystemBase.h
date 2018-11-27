@@ -32,8 +32,15 @@ enum class EOnlineDataAdvertisementTypeWrapper : uint8 {
 };
 
 UENUM(BlueprintType)
-enum class ESessionType : uint8
+enum class EOnlineSessionType : uint8
 {
 	Game,
 	Party
+};
+
+UENUM()
+enum class EOnlineSessionCustomSettingStatus : uint8
+{
+	Succeed,
+	Failed
 };

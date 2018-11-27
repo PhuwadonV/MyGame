@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
-#include "OnlineSessionSearchResultWrapper.h"
 #include "AsyncJoinOnlineRoom.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAsyncJoinOnlineRoomOutPin, FString, SessionURL);
@@ -14,14 +13,12 @@ private:
 	bool bIsFailed;
 	IOnlineSession *OnlineSession;
 	TSharedPtr<const FUniqueNetId> PlayerId;
-	ESessionType SessionType;
-	FDelegateHandle DelegateHandle;
-
-	UPROPERTY()
-	const UOnlineSessionSearchResultWrapper *OnlineSessionSearchResultWrapper;
+	EOnlineSessionType SessionType;
+	FOnlineSessionSearchResult OnlineSessionSearchResult;
+	FDelegateHandle OnCompleteDelegateHandle;
 public:
 	UFUNCTION(BlueprintCallable, Category = "Online|Session", meta = (BlueprintInternalUseOnly = "true"))
-	static UAsyncJoinOnlineRoom* JoinOnlineRoom(UPARAM() APlayerController *PlayerController, FName OnlineSubsystem, const UOnlineSessionSearchResultWrapper *Session, ESessionType SessionType);
+	static UAsyncJoinOnlineRoom* JoinOnlineRoom(UPARAM() APlayerController *PlayerController, FName OnlineSubsystem, const FBlueprintSessionResult &Session, EOnlineSessionType SessionType);
 
 	UPROPERTY(BlueprintAssignable)
 	FAsyncJoinOnlineRoomOutPin OnSuccess;

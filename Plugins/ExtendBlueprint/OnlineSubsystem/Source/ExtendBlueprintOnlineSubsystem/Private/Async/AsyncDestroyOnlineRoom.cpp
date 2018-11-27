@@ -2,35 +2,35 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionInterface.h"
 
-UAsyncDestroyOnlineRoom* UAsyncDestroyOnlineRoom::DestroyOnlineRoom(FName OnlineSubsystem, ESessionType SessionType) {
-	UAsyncDestroyOnlineRoom *asyncDestroyOnlineRoom = NewObject<UAsyncDestroyOnlineRoom>();
+UAsyncDestroyOnlineRoom* UAsyncDestroyOnlineRoom::DestroyOnlineRoom(FName OnlineSubsystem, EOnlineSessionType SessionType) {
+	UAsyncDestroyOnlineRoom *AsyncDestroyOnlineRoom = NewObject<UAsyncDestroyOnlineRoom>();
 
-	IOnlineSubsystem *onlineSubsystem;
+	IOnlineSubsystem *OnlineSubsystemInterface;
 	if (OnlineSubsystem == NAME_None) {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get();
 	}
 	else {
-		onlineSubsystem = IOnlineSubsystem::Get(OnlineSubsystem);
+		OnlineSubsystemInterface = IOnlineSubsystem::Get(OnlineSubsystem);
 	}
 
-	if (onlineSubsystem != nullptr) {
-		IOnlineSessionPtr onlineSessionPtr = onlineSubsystem->GetSessionInterface();
-		if (onlineSessionPtr.IsValid()) {
-			asyncDestroyOnlineRoom->OnlineSession = onlineSessionPtr.Get();
+	if (OnlineSubsystemInterface != nullptr) {
+		IOnlineSessionPtr OnlineSessionPtr = OnlineSubsystemInterface->GetSessionInterface();
+		if (OnlineSessionPtr.IsValid()) {
+			AsyncDestroyOnlineRoom->OnlineSession = OnlineSessionPtr.Get();
 		}
 		else {
-			asyncDestroyOnlineRoom->bIsFailed = true;
-			return asyncDestroyOnlineRoom;
+			AsyncDestroyOnlineRoom->bIsFailed = true;
+			return AsyncDestroyOnlineRoom;
 		}
 	}
 	else {
-		asyncDestroyOnlineRoom->bIsFailed = true;
-		return asyncDestroyOnlineRoom;
+		AsyncDestroyOnlineRoom->bIsFailed = true;
+		return AsyncDestroyOnlineRoom;
 	}
 
-	asyncDestroyOnlineRoom->SessionType = SessionType;
+	AsyncDestroyOnlineRoom->SessionType = SessionType;
 
-	return asyncDestroyOnlineRoom;
+	return AsyncDestroyOnlineRoom;
 }
 
 void UAsyncDestroyOnlineRoom::Activate() {
@@ -39,19 +39,19 @@ void UAsyncDestroyOnlineRoom::Activate() {
 	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UAsyncDestroyOnlineRoom::OnComplete);
 
 	switch (SessionType) {
-	case ESessionType::Game:
+	case EOnlineSessionType::Game:
 		OnlineSession->DestroySession(GameSessionName, OnDestroySessionCompleteDelegate);
 		break;
-	case ESessionType::Party:
+	case EOnlineSessionType::Party:
 		OnlineSession->DestroySession(PartySessionName, OnDestroySessionCompleteDelegate);
 		break;
 	}
 
-	DelegateHandle = OnDestroySessionCompleteDelegate.GetHandle();
+	OnCompleteDelegateHandle = OnDestroySessionCompleteDelegate.GetHandle();
 }
 
 void UAsyncDestroyOnlineRoom::OnComplete(FName SessionName, bool bWasSuccessful) {
-	OnlineSession->ClearOnDestroySessionCompleteDelegate_Handle(DelegateHandle);
+	OnlineSession->ClearOnDestroySessionCompleteDelegate_Handle(OnCompleteDelegateHandle);
 
 	if (bWasSuccessful) {
 		OnSuccess.Broadcast();

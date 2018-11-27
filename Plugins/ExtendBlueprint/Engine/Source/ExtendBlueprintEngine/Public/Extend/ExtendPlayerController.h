@@ -4,7 +4,7 @@
 #include "ExtendPlayerController.generated.h"
 
 UCLASS()
-class UExtendPlayerController : public UBlueprintFunctionLibrary {
+class UExtendPlayerController : public UObject {
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, Category = "Networking")

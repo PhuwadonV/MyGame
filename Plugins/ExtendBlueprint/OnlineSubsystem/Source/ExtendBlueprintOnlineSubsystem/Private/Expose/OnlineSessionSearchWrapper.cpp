@@ -7,47 +7,42 @@ UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::CreateOnlineSessionSea
 
 UOnlineSessionSearchWrapper::UOnlineSessionSearchWrapper(const FObjectInitializer &ObjectInitlizer) :
 	Super(ObjectInitlizer) {
-	data.bIsLanQuery = false;
-	data.MaxSearchResults = 100;
-	data.PingBucketSize = 50;
+	Data.bIsLanQuery = false;
+	Data.MaxSearchResults = 100;
+	Data.PingBucketSize = 50;
 }
 
 UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetIsLanQuery(bool bIsLanQuery) {
-	data.bIsLanQuery = bIsLanQuery;
+	Data.bIsLanQuery = bIsLanQuery;
 	return this;
 }
 
 UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetMaxSearchResults(int32 MaxSearchResults) {
-	data.MaxSearchResults = MaxSearchResults;
+	Data.MaxSearchResults = MaxSearchResults;
 	return this;
 }
 
 UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetPingBucketSize(int32 PingBucketSize) {
-	data.PingBucketSize = PingBucketSize;
+	Data.PingBucketSize = PingBucketSize;
 	return this;
 }
 
 UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetPlatformHash(bool PlatformHash) {
-	data.PlatformHash = PlatformHash;
+	Data.PlatformHash = PlatformHash;
 	return this;
 }
 
 UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetTimeoutInSeconds(bool TimeoutInSeconds) {
-	data.TimeoutInSeconds = TimeoutInSeconds;
+	Data.TimeoutInSeconds = TimeoutInSeconds;
 	return this;
 }
 
 UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetIsPresence(bool bIsPresence) {
-	data.QuerySettings.Set(SEARCH_PRESENCE, bIsPresence, EOnlineComparisonOp::Equals);
+	Data.QuerySettings.Set(SEARCH_PRESENCE, bIsPresence, EOnlineComparisonOp::Equals);
 	return this;
 }
 
 UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetQueryString(FName Key, FString Value, EOnlineComparisonOpWrapper CompareOp) {
-	data.QuerySettings.Set(Key, Value, static_cast<EOnlineComparisonOp::Type>(*reinterpret_cast<uint8*>(&CompareOp)));
-	return this;
-}
-
-UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetQueryInteger(FName Key, int32 Value, EOnlineComparisonOpWrapper CompareOp) {
-	data.QuerySettings.Set(Key, Value, static_cast<EOnlineComparisonOp::Type>(*reinterpret_cast<uint8*>(&CompareOp)));
+	Data.QuerySettings.Set(Key, Value, static_cast<EOnlineComparisonOp::Type>(*reinterpret_cast<uint8*>(&CompareOp)));
 	return this;
 }

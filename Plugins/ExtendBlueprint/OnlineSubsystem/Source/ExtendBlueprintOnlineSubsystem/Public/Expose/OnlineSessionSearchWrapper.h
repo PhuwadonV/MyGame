@@ -7,7 +7,7 @@ UCLASS(BlueprintType)
 class UOnlineSessionSearchWrapper : public UObject {
 	GENERATED_UCLASS_BODY()
 public:
-	FOnlineSessionSearch data;
+	FOnlineSessionSearch Data;
 
 	UFUNCTION(BlueprintCallable, Category = "Online|Session")
 	static UOnlineSessionSearchWrapper* CreateOnlineSessionSearchWrapper();
@@ -32,7 +32,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UOnlineSessionSearchWrapper* SetQueryString(FName Key, FString Value, EOnlineComparisonOpWrapper CompareOp);
-
-	UFUNCTION(BlueprintCallable)
-	UOnlineSessionSearchWrapper* SetQueryInteger(FName Key, int32 Value, EOnlineComparisonOpWrapper CompareOp);
 };
