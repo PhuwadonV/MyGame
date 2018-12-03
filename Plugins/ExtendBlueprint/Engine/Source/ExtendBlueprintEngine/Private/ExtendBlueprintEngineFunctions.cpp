@@ -5,6 +5,6 @@ bool UExtendBlueprintEngineFunctions::ServerTravel(const UObject *WorldContextOb
 	return WorldContextObject->GetWorld()->ServerTravel(URL, bAbsolute, ShouldSkipGameNotify);
 }
 
-void UExtendBlueprintEngineFunctions::SeamlessTravel(const UObject *WorldContextObject, const FString &URL, bool bAbsolute, FGuid MapPackageGuid) {
-	return WorldContextObject->GetWorld()->SeamlessTravel(URL, bAbsolute, MapPackageGuid);
+void UExtendBlueprintEngineFunctions::ClientTravel(APlayerController *PlayerController, const FString &URL, enum ETravelType TravelType, bool bSeamless, FGuid MapPackageGuid) {
+	PlayerController->ClientTravel(URL, TravelType, bSeamless, MapPackageGuid);
 }

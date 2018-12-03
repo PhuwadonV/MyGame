@@ -2,7 +2,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionInterface.h"
 
-#if WITH_EDITOR
+#if !UE_BUILD_SHIPPING
 #include "Engine.h"
 #endif
 
@@ -35,8 +35,8 @@ UAsyncJoinOnlineRoom* UAsyncJoinOnlineRoom::JoinOnlineRoom(APlayerController *Pl
 	AsyncJoinOnlineRoom->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
 
 	if (!AsyncJoinOnlineRoom->PlayerId.IsValid()) {
-#if WITH_EDITOR
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Invalid Player ID"));
+#if !UE_BUILD_SHIPPING
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Invalid Player ID"));
 #endif
 		AsyncJoinOnlineRoom->bIsFailed = true;
 		return AsyncJoinOnlineRoom;
@@ -49,7 +49,10 @@ UAsyncJoinOnlineRoom* UAsyncJoinOnlineRoom::JoinOnlineRoom(APlayerController *Pl
 }
 
 void UAsyncJoinOnlineRoom::Activate() {
-	if (bIsFailed) return;
+	if (bIsFailed) {
+		OnFailure.Broadcast(FString());
+		return;
+	}
 
 	FOnJoinSessionCompleteDelegate onJoinSessionComplete = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UAsyncJoinOnlineRoom::OnComplete);
 	OnCompleteDelegateHandle = OnlineSession->AddOnJoinSessionCompleteDelegate_Handle(onJoinSessionComplete);
@@ -65,10 +68,12 @@ void UAsyncJoinOnlineRoom::Activate() {
 }
 
 void UAsyncJoinOnlineRoom::OnComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result) {
+	OnlineSession->ClearOnJoinSessionCompleteDelegate_Handle(OnCompleteDelegateHandle);
+
 	if (Result == EOnJoinSessionCompleteResult::Success) {
-		FString ServerUrl;
-		OnlineSession->GetResolvedConnectString(SessionName, ServerUrl);
-		OnSuccess.Broadcast(ServerUrl);
+		FString SessionUrl;
+		OnlineSession->GetResolvedConnectString(SessionName, SessionUrl);
+		OnSuccess.Broadcast(SessionUrl);
 	}
 	else {
 		OnFailure.Broadcast(FString());

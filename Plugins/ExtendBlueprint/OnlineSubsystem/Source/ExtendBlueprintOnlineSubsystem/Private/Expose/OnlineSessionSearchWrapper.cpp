@@ -41,8 +41,3 @@ UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetIsPresence(bool bIs
 	Data.QuerySettings.Set(SEARCH_PRESENCE, bIsPresence, EOnlineComparisonOp::Equals);
 	return this;
 }
-
-UOnlineSessionSearchWrapper* UOnlineSessionSearchWrapper::SetQueryString(FName Key, FString Value, EOnlineComparisonOpWrapper CompareOp) {
-	Data.QuerySettings.Set(Key, Value, static_cast<EOnlineComparisonOp::Type>(*reinterpret_cast<uint8*>(&CompareOp)));
-	return this;
-}

@@ -2,7 +2,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionInterface.h"
 
-#if WITH_EDITOR
+#if !UE_BUILD_SHIPPING
 #include "Engine.h"
 #endif
 
@@ -35,8 +35,8 @@ UAsyncFindOnlineRooms* UAsyncFindOnlineRooms::FindOnlineRooms(APlayerController 
 	AsyncFindOnlineRooms->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
 
 	if (!AsyncFindOnlineRooms->PlayerId.IsValid()) {
-#if WITH_EDITOR
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Invalid Player ID"));
+#if !UE_BUILD_SHIPPING
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Invalid Player ID"));
 #endif
 		AsyncFindOnlineRooms->bIsFailed = true;
 		return AsyncFindOnlineRooms;
@@ -57,7 +57,10 @@ UAsyncFindOnlineRooms* UAsyncFindOnlineRooms::FindOnlineRooms(APlayerController 
 }
 
 void UAsyncFindOnlineRooms::Activate() {
-	if (bIsFailed) return;
+	if (bIsFailed) {
+		OnFailure.Broadcast(BlueprintSessionResults);
+		return;
+	}
 
 	FOnFindSessionsCompleteDelegate onFindSessionsComplete = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UAsyncFindOnlineRooms::OnComplete);
 
@@ -67,6 +70,8 @@ void UAsyncFindOnlineRooms::Activate() {
 }
 
 void UAsyncFindOnlineRooms::OnComplete(bool bWasSuccessful) {
+	OnlineSession->ClearOnFindSessionsCompleteDelegate_Handle(OnCompleteDelegateHandle);
+
 	if (bWasSuccessful) {
 		for (int32 i = 0; i < SessionSearch->SearchResults.Num(); i++)
 		{

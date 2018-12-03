@@ -3,10 +3,10 @@
 #include "ExtendBlueprintOnlineSubsystemBase.h"
 #include "FindSessionsCallbackProxy.h"
 #include "OnlineSessionSettingsWrapper.h"
-#include "ExtendBlueprintSessionResult.generated.h"
+#include "ExtendBlueprintOnlineSubsystemFunctions.generated.h"
 
 UCLASS()
-class UExtendBlueprintSessionResult : public UObject {
+class UExtendBlueprintOnlineSubsystemFunctions : public UBlueprintFunctionLibrary {
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintPure)

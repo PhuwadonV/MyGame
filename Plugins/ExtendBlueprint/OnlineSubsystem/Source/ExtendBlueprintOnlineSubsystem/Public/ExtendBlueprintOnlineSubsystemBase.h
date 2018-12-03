@@ -5,23 +5,11 @@
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
+#include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/GameSession.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSessionInterface.h"
-
-UENUM(BlueprintType)
-enum class EOnlineComparisonOpWrapper : uint8 {
-	Equals            = EOnlineComparisonOp::Equals,
-	NotEquals         = EOnlineComparisonOp::NotEquals,
-	GreaterThan       = EOnlineComparisonOp::GreaterThan,
-	GreaterThanEquals = EOnlineComparisonOp::GreaterThanEquals,
-	LessThan          = EOnlineComparisonOp::LessThan,
-	LessThanEquals    = EOnlineComparisonOp::LessThanEquals,
-	Near              = EOnlineComparisonOp::Near,
-	In                = EOnlineComparisonOp::In,
-	NotIn             = EOnlineComparisonOp::NotIn
-};
 
 UENUM(BlueprintType)
 enum class EOnlineDataAdvertisementTypeWrapper : uint8 {

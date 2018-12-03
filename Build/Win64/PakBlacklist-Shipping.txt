@@ -1,0 +1,7 @@
+../../../Engine/Content/EngineDebugMaterials/
+../../../Engine/Content/EngineMaterials/DefaultBloomKernel.uasset
+../../../Engine/Content/EngineMaterials/DefaultBloomKernel.uexp
+../../../Engine/Content/MobileResources/
+../../../Engine/Content/Slate/Fonts/DroidSansFallback.ttf
+../../../Engine/Content/SlateDebug/
+../../../Engine/Content/Tutorial/

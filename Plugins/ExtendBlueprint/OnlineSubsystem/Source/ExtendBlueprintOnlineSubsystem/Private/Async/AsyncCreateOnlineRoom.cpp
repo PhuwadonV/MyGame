@@ -4,7 +4,7 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSessionInterface.h"
 
-#if WITH_EDITOR
+#if !UE_BUILD_SHIPPING
 #include "Engine.h"
 #endif
 
@@ -37,8 +37,8 @@ UAsyncCreateOnlineRoom* UAsyncCreateOnlineRoom::CreateOnlineRoom(APlayerControll
 	AsyncCreateOnlineRoom->PlayerId = PlayerController->PlayerState->UniqueId.GetUniqueNetId();
 
 	if (!AsyncCreateOnlineRoom->PlayerId.IsValid()) {
-#if WITH_EDITOR
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("Invalid Player ID"));
+#if !UE_BUILD_SHIPPING
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Invalid Player ID"));
 #endif
 		AsyncCreateOnlineRoom->bIsFailed = true;
 		return AsyncCreateOnlineRoom;
@@ -57,7 +57,10 @@ UAsyncCreateOnlineRoom* UAsyncCreateOnlineRoom::CreateOnlineRoom(APlayerControll
 }
 
 void UAsyncCreateOnlineRoom::Activate() {
-	if (bIsFailed) return;
+	if (bIsFailed) {
+		OnFailure.Broadcast();
+		return;
+	}
 
 	OnCompleteDelegateHandle = OnlineSession->AddOnCreateSessionCompleteDelegate_Handle(
 		FOnCreateSessionCompleteDelegate::CreateUObject(this, &UAsyncCreateOnlineRoom::OnCreateSessionComplete));
@@ -90,6 +93,11 @@ void UAsyncCreateOnlineRoom::OnStartSessionComplete(FName SessionName, bool bWas
 	OnlineSession->ClearOnStartSessionCompleteDelegate_Handle(OnCompleteDelegateHandle);
 
 	if (bWasSuccessful) {
+#if !UE_BUILD_SHIPPING
+		FString SessionUrl;
+		OnlineSession->GetResolvedConnectString(SessionName, SessionUrl);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Session URL : %s"), *SessionUrl));
+#endif
 		OnSuccess.Broadcast();
 	}
 	else {

@@ -12,5 +12,5 @@ public class ExtendBlueprintOnlineSubsystem : ModuleRules
             "Engine",
             "OnlineSubsystem",
             "OnlineSubsystemUtils" } );
-	}
+    }
 }

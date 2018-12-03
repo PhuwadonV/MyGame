@@ -34,7 +34,10 @@ UAsyncDestroyOnlineRoom* UAsyncDestroyOnlineRoom::DestroyOnlineRoom(FName Online
 }
 
 void UAsyncDestroyOnlineRoom::Activate() {
-	if (bIsFailed) return;
+	if (bIsFailed) {
+		OnFailure.Broadcast();
+		return;
+	}
 
 	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UAsyncDestroyOnlineRoom::OnComplete);
 

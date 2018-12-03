@@ -29,7 +29,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UOnlineSessionSearchWrapper* SetIsPresence(bool bIsPresence);
-
-	UFUNCTION(BlueprintCallable)
-	UOnlineSessionSearchWrapper* SetQueryString(FName Key, FString Value, EOnlineComparisonOpWrapper CompareOp);
 };
