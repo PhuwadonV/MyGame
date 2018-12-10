@@ -4,10 +4,6 @@
 #include "Engine.h"
 #endif
 
-void UExtendBlueprintEngineFunctions::Print(const FString &Message, float TimeToDisplay, FColor DisplayColor) {
-	GEngine->AddOnScreenDebugMessage(-1, TimeToDisplay, DisplayColor, Message);
-}
-
 TArray<APlayerController*> UExtendBlueprintEngineFunctions::GetPlayerControllers(const UObject *WorldContextObject) {
 	TArray<APlayerController*> Players;
 	for (auto Player = WorldContextObject->GetWorld()->GetPlayerControllerIterator(); Player; ++Player)
@@ -23,4 +19,20 @@ bool UExtendBlueprintEngineFunctions::ServerTravel(const UObject *WorldContextOb
 
 void UExtendBlueprintEngineFunctions::ClientTravel(APlayerController *PlayerController, const FString &URL, enum ETravelType TravelType, bool bSeamless, FGuid MapPackageGuid) {
 	PlayerController->ClientTravel(URL, TravelType, bSeamless, MapPackageGuid);
+}
+
+FUniqueNetIdRepl UExtendBlueprintEngineFunctions::UniqueID(APlayerState *PlayerState) {
+	return PlayerState->UniqueId;
+}
+
+FString UExtendBlueprintEngineFunctions::ToString(const FUniqueNetIdRepl &UniqueNetIdRepl) {
+	return UniqueNetIdRepl.ToString();
+}
+
+bool UExtendBlueprintEngineFunctions::CompareEqualily(const FUniqueNetIdRepl &A, const FUniqueNetIdRepl &B) {
+	return A == B;
+}
+
+bool UExtendBlueprintEngineFunctions::CompareNotEqualily(const FUniqueNetIdRepl &A, const FUniqueNetIdRepl &B) {
+	return A != B;
 }
