@@ -1,7 +1,6 @@
 using UnrealBuildTool;
 
-public class ExtendBlueprintEngine : ModuleRules
-{
+public class ExtendBlueprintEngine : ModuleRules {
 	public ExtendBlueprintEngine(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;		
