@@ -15,10 +15,10 @@
 
 UENUM(BlueprintType)
 enum class EOnlineDataAdvertisementTypeWrapper : uint8 {
-	DontAdvertise           = EOnlineDataAdvertisementType::DontAdvertise,
-	ViaOnlineService        = EOnlineDataAdvertisementType::ViaOnlineService,
-	ViaOnlineServiceAndPing = EOnlineDataAdvertisementType::ViaOnlineServiceAndPing,
-	ViaPingOnly             = EOnlineDataAdvertisementType::ViaPingOnly
+	DontAdvertise,
+	ViaOnlineService,
+	ViaOnlineServiceAndPing,
+	ViaPingOnly
 };
 
 UENUM(BlueprintType)
